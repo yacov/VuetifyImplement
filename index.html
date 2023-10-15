@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D-ID Streaming POC</title>
+  <!-- added google fonts -->
+  <link href='https://fonts.googleapis.com' rel='preconnect' />
+  <link crossorigin href='https://fonts.gstatic.com' rel='preconnect' />
+  <link
+    href='https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;700&display=swap'
+    rel='stylesheet'
+  />
+
+  <style>
+      .peerConnectionState-new {
+          color: cornflowerblue;
+      }
+
+      .peerConnectionState-connecting {
+          color: orange;
+      }
+
+      .peerConnectionState-connected {
+          color: green;
+      }
+
+      .peerConnectionState-disconnected,
+      .peerConnectionState-closed,
+      .peerConnectionState-failed {
+          color: red;
+      }
+
+      .iceConnectionState-new {
+          color: cornflowerblue;
+      }
+
+      .iceConnectionState-checking {
+          color: orange;
+      }
+
+      .iceConnectionState-connected,
+      .iceConnectionState-completed {
+          color: green;
+      }
+
+      .peerConnectionState-disconnected,
+      .peerConnectionState-closed,
+      .peerConnectionState-failed {
+          color: red;
+      }
+
+      .iceGatheringState-new {
+          color: cornflowerblue;
+      }
+
+      .iceGatheringState-gathering {
+          color: orange;
+      }
+
+      .iceGatheringState-complete {
+          color: black;
+      }
+
+      .signalingState-stable {
+          color: green;
+      }
+
+      .signalingState-have-local-offer,
+      .signalingState-have-remote-offer,
+      .signalingState-have-local-pranswer,
+      .signalingState-have-remote-pranswer {
+          color: cornflowerblue;
+      }
+
+      .signalingState-closed {
+          color: red;
+      }
+
+      .streamingState-streaming {
+          color: green;
+      }
+
+      .streamingState-empty {
+          color: grey;
+      }
+
+      /* added css from here */
+      body {
+        background-image: url('oig3.png');
+        background-repeat: no-repeat;
+        background-size: 100% auto;;
+        background-position: 25px center;
+      }
+      body * {
+          font-family: 'Mulish', sans-serif;
+          text-align: center;
+          height: 100%;
+          margin: 0;
+      }
+
+      #content {
+          width: 820px;
+          position: relative;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          align-items: center;
+      }
+
+      #buttons {
+          clear: both;
+          padding: 0 0 0 0;
+          text-align: center;
+      }
+
+      button {
+          padding: 10px 20px;
+          border-radius: 5px;
+          border: none;
+          font-size: 16px;
+          margin: 0 5px;
+          background-color: #7459fe;
+          color: #fff;
+      }
+
+      button:hover {
+          background-color: #9480ff;
+          cursor: pointer;
+          transition: all 0.2s ease-out;
+      }
+
+      #logo {
+        position: absolute;
+        top: 270px; /* Adjusted from 10px to 260px */
+        left: 50px; /* Adjusted from 10px to 50px */
+        width: 50px; /* Adjust as necessary */
+        height: 50px; /* Adjust as necessary */
+      }
+
+      #status {
+          clear: both;
+          padding: 20px 0 0 0;
+          text-align: left;
+          display: inline-block;
+          zoom: 1;
+          line-height: 140%;
+          font-size: 15px;
+          display: flex;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          width: 100%;
+          padding: 10px 0;
+          margin-top: auto;
+      }
+
+      .status-item {
+          margin: 0 10px;
+      }
+      .loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+      #status div {
+          padding-bottom: 10px;
+      }
+      #video-container {
+        width: 800px;
+  height: 800px;
+      }
+
+#spinner {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+      #video-wrapper {
+        width: 800px;
+  height: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+      }
+
+      #video-wrapper div {
+        width: 800px;
+  height: 800px;
+          margin: 0 auto;
+          overflow: hidden;
+          border-radius: 5%; /* Optional */
+      }
+
+      video {
+        position: relative;
+  left: -63px;
+  top: 297px;
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+          border-radius: 5%;
+      }
+
+      #user-input-field {
+          width: 90%; /* Adjust this value to make the input field as wide as you want */
+          font-size: 20px; /* Adjust this value to change the size of the input text */
+          margin: 0 auto; /* This centers the input field */
+          margin-top: 20px; /* This puts some space between the input field and the horizontal rule */
+          display: block; /* This makes the input field a block element, which is necessary for centering */
+      }
+      .recording {
+    background-color: red !important;
+    color: white;
+  }
+  </style>
+</head>
+
+<body>
+<!-- adde "id=content" -->
+<div id='content'>
+  <img alt='Logo' id='logo' src='logo.jpg'>
+  <!-- added "id=video-wrapper" -->
+  <div id='video-container'>
+    <div id='video-wrapper'>
+      <div>
+        <video autoplay height='542' id='talk-video' width='800'></video>
+      </div>
+    </div>
+    <div id='spinner' style='display: none;'>
+      <div class='loader'></div>
+    </div>
+  </div>
+  <br />
+  <div id='input-container'>
+    <input id='user-input-field' placeholder='Enter your message...' type='text'>
+    <hr> <!-- Add a horizontal rule -->
+  </div>
+  <!-- added div#buttons -->
+  <div id='settings'>
+  <div id='language-selection'>
+    <input type='radio' id='english' name='language' value='en-US' checked>
+    <label for='english'>English</label>
+    <input type='radio' id='arabic' name='language' value='ar'>
+    <label for='arabic'>Arabic</label>
+  </div>
+  <div id='avatar-selection'>
+    <input type='radio' id='man' name='avatar' value='man' checked>
+    <label for='man'>Man</label>
+    <input type='radio' id='woman' name='avatar' value='woman'>
+    <label for='woman'>Woman</label>
+  </div>
+</div>
+  <div id='buttons'>
+    <button id='connect-button' type='button'>Connect bot</button>
+    <!--        <button id="talk-button" type="button">Start</button>-->
+    <button id='mic-button' type='button'>Mic</button>
+    <button id='destroy-button' type='button'>Stop bot</button>
+  </div>
+  <!-- added div#status -->
+  <div id='status' style='display: flex; justify-content: space-between; flex-wrap: wrap;'>
+
+    <div class='status-item'>
+      ICE gathering status: <label id='ice-gathering-status-label'></label>
+    </div>
+
+    <div class='status-item'>
+      ICE status: <label id='ice-status-label'></label>
+    </div>
+
+    <div class='status-item'>
+      Peer connection status: <label id='peer-status-label'></label>
+    </div>
+
+    <div class='status-item'>
+      Signaling status: <label id='signaling-status-label'></label>
+    </div>
+
+    <div class='status-item'>
+      Streaming status: <label id='streaming-status-label'></label>
+    </div>
+
+  </div>
+
+</div>
+
+<script src='./index.js' type='module'></script>
+<script src='./streaming-client-api.js' type='module'></script>
+</body>
+</html>
